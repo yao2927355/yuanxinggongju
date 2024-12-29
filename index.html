@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>产品原型生成器</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./src/styles.css">
+    <link rel="stylesheet" href="./src/styles/Settings.css">
+</head>
+<body>
+    <!-- 全局设置按钮 -->
+    <div class="global-settings">
+        <button id="settingsBtn">⚙️ 设置</button>
+    </div>
+
+    <!-- 项目列表页面 -->
+    <div id="projectList" class="project-list-page">
+        <div class="project-list-header">
+            <h1>我的项目</h1>
+            <button id="newProjectBtn" class="primary-btn">创建新项目</button>
+        </div>
+        <div id="projectListContainer" class="project-list-container">
+            <!-- 项目列表将通过 JavaScript 动态生成 -->
+        </div>
+    </div>
+
+    <!-- 项目创建页面 -->
+    <div id="projectCreation" class="project-creation" style="display: none;">
+        <div class="project-form">
+            <h1>创建新项目</h1>
+            <div class="form-group">
+                <label for="projectName">项目名称</label>
+                <input type="text" id="projectName" placeholder="请输入项目名称">
+            </div>
+            <div class="form-group">
+                <label for="projectDesc">项目描述</label>
+                <textarea id="projectDesc" placeholder="请简要描述你的项目（选填）"></textarea>
+            </div>
+            <div class="form-buttons">
+                <button id="cancelCreate" class="secondary-btn">取消</button>
+                <button id="createProject" class="primary-btn">创建项目</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 原型生成页面 -->
+    <div id="prototypeGenerator" class="container" style="display: none;">
+        <div class="left-panel">
+            <div class="project-header">
+                <h2 id="currentProjectName"></h2>
+                <button id="backToProjects">返回项目列表</button>
+            </div>
+            <div class="chat-container">
+                <div id="chatHistory" class="chat-history"></div>
+                <div class="chat-input">
+                    <textarea id="requirements" placeholder="请输入你的需求描述..."></textarea>
+                    <button id="generate">发送</button>
+                </div>
+            </div>
+        </div>
+        <div class="resizer"></div>
+        <div class="right-panel">
+            <div id="preview"></div>
+        </div>
+    </div>
+
+    <!-- 设置模态框 -->
+    <div id="settingsModal" class="settings-modal">
+        <div class="settings-content">
+            <h2>API 设置</h2>
+            <div class="form-group">
+                <label for="apiType">API 类型</label>
+                <select id="apiType">
+                    <option value="azure">Azure OpenAI</option>
+                    <option value="openai">OpenAI</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="apiKey">API 密钥</label>
+                <input type="password" id="apiKey" placeholder="输入你的 API 密钥">
+            </div>
+
+            <div id="azureSettings">
+                <div class="form-group">
+                    <label for="azureResourceName">Azure 资源名称</label>
+                    <input type="text" id="azureResourceName" placeholder="例如：myopenai">
+                </div>
+                
+                <div class="form-group">
+                    <label for="azureDeploymentName">部署名称</label>
+                    <input type="text" id="azureDeploymentName" placeholder="例如：gpt-35-turbo">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="promptTemplate">提示词模板（选填）</label>
+                <textarea id="promptTemplate" placeholder="输入自定义的提示词模板"></textarea>
+            </div>
+
+            <div class="form-buttons">
+                <button id="closeSettings" class="secondary-btn">取消</button>
+                <button id="saveSettings" class="primary-btn">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="./src/services/ai-service.js"></script>
+    <script src="./src/code-highlighter.js"></script>
+    <script type="module" src="./src/main.js"></script>
+</body>
+</html> 

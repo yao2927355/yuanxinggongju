@@ -1,3 +1,6 @@
+import './styles.css';
+import './styles/Settings.css';
+
 class PrototypeGenerator {
     constructor() {
         this.initializeAIService();
@@ -134,7 +137,7 @@ class PrototypeGenerator {
     }
 
     showSuccess(message) {
-        alert(message); // 可��改为更友好的提示
+        alert(message); // 可以改为更友好的提示
     }
 
     showError(message) {
@@ -142,6 +145,13 @@ class PrototypeGenerator {
     }
 
     init() {
+        console.log('Initializing...');
+        
+        // 添加测试点击事件
+        document.body.addEventListener('click', () => {
+            console.log('Body clicked');
+        });
+
         // 项目列表页面元素
         this.projectList = document.getElementById('projectList');
         this.projectListContainer = document.getElementById('projectListContainer');
@@ -427,7 +437,7 @@ class PrototypeGenerator {
         this.projectCreation.style.display = 'none';
         this.prototypeGenerator.style.display = 'flex';
         
-        // ��示下载按钮
+        // 显示下载按钮
         const downloadBtn = document.getElementById('downloadBtn');
         if (downloadBtn) {
             downloadBtn.style.display = 'flex';
@@ -936,47 +946,59 @@ class PrototypeGenerator {
     }
 
     initResizer() {
-        const resizer = document.querySelector('.resizer');
+        const container = document.querySelector('.container');
         const leftPanel = document.querySelector('.left-panel');
         const rightPanel = document.querySelector('.right-panel');
-        const chatInput = document.querySelector('.chat-input');
-
+        const resizer = document.querySelector('.resizer');
         let isResizing = false;
         let startX;
-        let startWidth;
+        let startLeftWidth;
+        let startRightWidth;
 
         resizer.addEventListener('mousedown', (e) => {
             isResizing = true;
             startX = e.pageX;
-            startWidth = leftPanel.offsetWidth;
+
+            // 获取初始宽度
+            const leftRect = leftPanel.getBoundingClientRect();
+            const rightRect = rightPanel.getBoundingClientRect();
+            startLeftWidth = leftRect.width;
+            startRightWidth = rightRect.width;
 
             // 添加临时事件监听器
             document.addEventListener('mousemove', handleMouseMove);
             document.addEventListener('mouseup', handleMouseUp);
-
-            // 添加正在拖拽的状态类
             document.body.classList.add('resizing');
         });
 
         function handleMouseMove(e) {
             if (!isResizing) return;
 
-            const width = startWidth + (e.pageX - startX);
-            const containerWidth = document.querySelector('.container').offsetWidth;
+            const dx = e.pageX - startX;
+            const containerWidth = container.offsetWidth;
             
-            // 限制最小和最大宽度
-            const minWidth = 300;
-            const maxWidth = containerWidth - 300;
-            
-            if (width >= minWidth && width <= maxWidth) {
-                const widthPercentage = (width / containerWidth) * 100;
-                leftPanel.style.width = `${widthPercentage}%`;
-                rightPanel.style.width = `${100 - widthPercentage}%`;
-                
-                // 同时调整输入框宽度
-                if (chatInput) {
-                    chatInput.style.width = `${widthPercentage}%`;
-                }
+            // 计算新的宽度比例
+            let newLeftWidth = ((startLeftWidth + dx) / containerWidth) * 100;
+            let newRightWidth = ((startRightWidth - dx) / containerWidth) * 100;
+
+            // 限制最小宽度
+            const minWidth = (300 / containerWidth) * 100; // 转换为百分比
+            if (newLeftWidth < minWidth) {
+                newLeftWidth = minWidth;
+                newRightWidth = 100 - minWidth;
+            } else if (newRightWidth < minWidth) {
+                newRightWidth = minWidth;
+                newLeftWidth = 100 - minWidth;
+            }
+
+            // 应用新的宽度
+            leftPanel.style.flex = `0 0 ${newLeftWidth}%`;
+            rightPanel.style.flex = `0 0 ${newRightWidth}%`;
+
+            // 更新聊天输入框宽度
+            const chatInput = document.querySelector('.chat-input');
+            if (chatInput) {
+                chatInput.style.width = '100%';
             }
         }
 
@@ -986,10 +1008,47 @@ class PrototypeGenerator {
             document.removeEventListener('mouseup', handleMouseUp);
             document.body.classList.remove('resizing');
         }
+
+        // 添加触摸支持
+        resizer.addEventListener('touchstart', (e) => {
+            const touch = e.touches[0];
+            isResizing = true;
+            startX = touch.pageX;
+
+            const leftRect = leftPanel.getBoundingClientRect();
+            const rightRect = rightPanel.getBoundingClientRect();
+            startLeftWidth = leftRect.width;
+            startRightWidth = rightRect.width;
+
+            document.addEventListener('touchmove', handleTouchMove);
+            document.addEventListener('touchend', handleTouchEnd);
+            document.body.classList.add('resizing');
+        });
+
+        function handleTouchMove(e) {
+            if (!isResizing) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const dx = touch.pageX - startX;
+            // ... 其余逻辑与 handleMouseMove 相同
+        }
+
+        function handleTouchEnd() {
+            isResizing = false;
+            document.removeEventListener('touchmove', handleTouchMove);
+            document.removeEventListener('touchend', handleTouchEnd);
+            document.body.classList.remove('resizing');
+        }
     }
 }
 
 // 确保 DOM 加载完成后初始化
-document.addEventListener('DOMContentLoaded', () => {
-    window.app = new PrototypeGenerator();
+window.addEventListener('DOMContentLoaded', () => {
+    try {
+        console.log('Initializing PrototypeGenerator...');
+        window.app = new PrototypeGenerator();
+        console.log('PrototypeGenerator initialized successfully');
+    } catch (error) {
+        console.error('Failed to initialize PrototypeGenerator:', error);
+    }
 }); 
